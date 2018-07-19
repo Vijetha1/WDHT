@@ -15,7 +15,7 @@ Installation:
 
 Running:
 
-a) Testing: Change the phase to 'Testing' in the "12bits_NUS.py" code and directly obtain the mean average precsion. The pretrained weights are already downloaded as a part of the installation process above. 
+a) Testing: Change the phase to 'Testing' in the "12bits_NUS.py" code and directly obtain the mean average precision. The pretrained weights are already downloaded as a part of the installation process above. 
 b) Training: Change the phase to 'Training' to train the network as given in the paper. 
 
 
