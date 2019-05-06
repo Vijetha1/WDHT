@@ -20,4 +20,4 @@ b) Training: Change the phase to 'Training' to train the network as given in the
 
 
 P.S 
-Please contact me at vijetha.gattupalli@asu.edu for any questions, concerns or bugs. 
+Please contact me at vijetha.gattupalli@gmail.com for any questions, concerns or bugs. 
