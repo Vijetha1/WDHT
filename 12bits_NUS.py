@@ -10,10 +10,8 @@ import keras.backend as K
 from keras.callbacks import ModelCheckpoint
 import pdb
 import sys
-# sys.path.insert(0, '/media/vrpg/parent/vijetha/CVPR_2018_multiHashing')
 import utils
 import numpy as np
-import standardModels
 import datetime
 import json
 import utils
@@ -25,10 +23,13 @@ from scipy import io as sio
 from scipy.spatial.distance import cdist
 import ast
 
+from keras.applications import ResNet50
+from keras.layers import Dense, GlobalAveragePooling2D
+
 lambda1 = 10.0
 lambda2 = 1.0
 margin =  0.2
-MODEL_DIR = './weights_12bits_NUS.h5'
+MODEL_DIR = './../pretrainedWeights/weights_12bits_NUS.h5'
 IMAGE_WIDTH = IMAGE_HEIGHT = 227
 batch_size = 50
 phase = 'Testing'
@@ -40,7 +41,7 @@ totalTrainSamples = 100000
 totalTestSamples = 2000
 totalGallerySamples =100000
 
-f = h5py.File('./../../nus-wide/processed_mean/nusWide.hdf5', 'r')
+f = h5py.File('./../data/nusWide.hdf5', 'r')
 
 trainDataImages = f['train_img']
 trainDataLabels = f['train_label']
@@ -51,7 +52,6 @@ testDataImages = f['test_img']
 testDataLabels = f['test_label']
 testDataVectors = f['test_vector']
 
-model = 'Alexnet'
 
 def test():
     galleryHashes = np.zeros((int(totalGallerySamples/batch_size)*batch_size, nBits))
@@ -80,16 +80,21 @@ def test():
 
 class saveWeights(Callback):
     def __init__(self):
-        pass
+        self.count = 0
 
     def on_train_begin(self, logs={}):
+        test()
         pass
 
     def on_batch_end(self, batch, logs={}):
         pass
 
     def on_epoch_end(self, epoch, logs={}):
-        multiLab.save_weights(MODEL_DIR)
+        pass
+        # multiLab.save_weights('./../pretrainedWeights/weights_12bits_NUS_epoch_'+str(self.count)+'.h5')
+        # if self.count % 5 == 0 and self.count >= 0:
+        #     test()
+        # self.count = self.count + 1
 
     def on_train_end(self, logs={}):
         pass
@@ -130,9 +135,10 @@ def data_generator(totalSamples, batch_size=batch_size, dataset = 'T', phase='Tr
             m_j = np.array([curBatchVectorsTemp,]*batch_size)
             m_n = np.transpose(m_j, (1, 0, 2))
             curBatchVectors = m_n - m_j
-            curBatchImages = utils.cropImages(curBatchImages, cropHeight=227, cropWidth=227)
-            if model == 'Alexnet':
-                curBatchImages = curBatchImages[:,::-1,:,:]
+            curBatchImages = utils.cropImages(curBatchImages, cropHeight=224, cropWidth=224)
+            curBatchImages = np.transpose(curBatchImages, (0, 2, 3, 1))
+            # if model == 'Alexnet':
+            #     curBatchImages = curBatchImages[:,::-1,:,:]
             sim = cdist(curBatchVectorsTemp,curBatchVectorsTemp ,  'cosine')
             if augmentation:
                 seed = random.randint(1, 1e7)
@@ -142,7 +148,9 @@ def data_generator(totalSamples, batch_size=batch_size, dataset = 'T', phase='Tr
             elif phase == 'Test':
                 yield [curBatchImages, curBatchVectors], curBatchLabels
 
-model, firstLayer, lastLayer= standardModels.AlexNet(weights_path="./../pretrainedWeights/alexnet_weights.h5", retainTop = retainTop)
+model = ResNet50(weights='imagenet', include_top=False, input_shape=(224, 224, 3), pooling='avg')
+firstLayer, lastLayer = model.input, model.output
+
 def normalize(x):
     x = K.l2_normalize(x, axis=-1)
     return x
@@ -176,14 +184,6 @@ if not retainTop:
     multiLab = Model(inputs=[firstLayer, vectorInput], outputs=[cosine, output_hash, distances])
 else:
     multiLab = model
-
-sameWeights = utils.checkIfWeightsAreNotLost(model, multiLab, [1, 7, 8])
-
-if sameWeights:
-    print("Weights carried on from AlexNet are retained!!")
-else:
-    print("Weights carried on from AlexNet are not retained. Please check.")
-    pdb.set_trace()
 
 last_layer_variables = list()
 multiLab_len = len(multiLab.layers)
