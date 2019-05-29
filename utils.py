@@ -91,6 +91,7 @@ def meanSubtract(images, sourceDataSet='IMAGENET', order='RGB'):
 	    images[:, 0, :, :] -= 103.939
 	    images[:, 1, :, :] -= 116.779
 	    images[:, 2, :, :] -= 123.68 # values copied from https://github.com/heuritech/convnets-keras/blob/master/convnetskeras/convnets.py
+	    #this is the order in which the keras.applications models are trained. 
 	return images
 
 
