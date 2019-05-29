@@ -15,8 +15,8 @@ Installation:
    - h5py 2.9.0
    - scipy 0.18.1
 2. Replace the optimizers.py file in the Keras directory (/usr/local/lib/python2.7/dist-packages/keras) with the one in the current directory. The modified file contains a new class "FineTuneSGD" which is used in 12bits_NUS.py as an optimizer. 
-3. Download the processed dataset from https://www.dropbox.com/sh/s5evhny6syk5q3m/AABHgjeUgWBa9Lnvi0XfstdGa?dl=0 and keep this file in a sub folder called 'data' in the code folder, WDHT (The data-set is processed to be in 'BGR' color order).
-4. Download the pretrained weights from https://www.dropbox.com/sh/cqhd464glch2pkn/AADvSRMy8_6gP16rxnmNxSxta?dl=0 and keep this folder in a sub folder called 'weights' in the code folder, WDHT. 
+3. Download the processed dataset from https://www.dropbox.com/s/f48rnct40mjluhl/nusWide.hdf5?dl=0 and keep this file in a sub folder called 'data' in the code folder, WDHT (The data-set is processed to be in 'BGR' color order).
+4. Download the pretrained weights from https://www.dropbox.com/s/tvqs7l6kqvfwgdi/weights_12bits_NUS.h5?dl=0 and keep this folder in a sub folder called 'weights' in the code folder, WDHT. 
 
 
 Running:
