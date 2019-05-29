@@ -29,7 +29,7 @@ from keras.layers import Dense, GlobalAveragePooling2D
 lambda1 = 10.0
 lambda2 = 1.0
 margin =  0.2
-MODEL_DIR = './../pretrainedWeights/weights_12bits_NUS.h5'
+MODEL_DIR = './../weights/weights_12bits_NUS.h5'
 IMAGE_WIDTH = IMAGE_HEIGHT = 227
 batch_size = 50
 phase = 'Testing'
