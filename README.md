@@ -6,9 +6,14 @@ This repository is an implementation of the paper https://arxiv.org/abs/1806.058
 Installation:
 
 1. This code is built using the following set-up
+   - Ubuntu 14.0.4
    - Python 2.7
    - Tensorflow 1.0.0
    - Keras 2.2.4
+   - cv2 4.1.0
+   - numpy 1.16.3
+   - h5py 2.9.0
+   - scipy 0.18.1
 2. Replace the optimizers.py file in the Keras directory (/usr/local/lib/python2.7/dist-packages/keras) with the one in the current directory. The modified file contains a new class "FineTuneSGD" which is used in 12bits_NUS.py as an optimizer. 
 3. Download the processed dataset from https://www.dropbox.com/sh/s5evhny6syk5q3m/AABHgjeUgWBa9Lnvi0XfstdGa?dl=0 and keep this folder at the same level as the code folder, WDHT (The data-set is processed to be in 'BGR' color order).
 4. Download the pretrained weights from https://www.dropbox.com/sh/cqhd464glch2pkn/AADvSRMy8_6gP16rxnmNxSxta?dl=0 and keep this folder at the same level as the code folder, WDHT. 
