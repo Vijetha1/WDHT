@@ -1,3 +1,5 @@
+# UNDER UPDATE
+
 # WDHT
 Implementation of Weakly Supervised Deep Image Hashing through Tag Embeddings
 
