@@ -1,4 +1,4 @@
-# WDHT (UNDER UPDATE)
+# WDHT
 Implementation of Weakly Supervised Deep Image Hashing through Tag Embeddings
 
 This repository is an implementation of the paper https://arxiv.org/abs/1806.05804. In the current implementation, we used ResNet50 of the Keras library instead of AlexNet as reported in the paper. This is due to unavailability of AlexNet model in Keras. Consequently, we are able to achieve slightly more accuaracy than reported in the paper. 
