@@ -1,9 +1,7 @@
 import keras
-# import theano
 import keras.backend as K
 import numpy as np
 import pdb
-# import theano.tensor as T
 
 def catCrossEntr(l1=1):
 	def loss(y_true, y_pred):
