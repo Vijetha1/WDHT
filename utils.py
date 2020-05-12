@@ -8,7 +8,6 @@ def getData(dataset='CIFAR10', channels_last=True):
 	if dataset == 'CIFAR10':
 		#This matrix is made by the MATLAB/MatConvNet/DPSH_IJCAI_ version 1.0_beta23 code. As per the code, the data should be in RGB format(verified visually) 
 		data = sio.loadmat('./datasets/cifar-10.mat')
-
 	trainData = data['train_data']
 	trainLabels = data['train_L']
 	queryData = data['test_data']
@@ -26,18 +25,13 @@ def getData(dataset='CIFAR10', channels_last=True):
 def makeDataSet(imageIds, labels, labelType = 'oneHot', nImagesPerClassTrain=500, nImagesPerClassTest = 100):
 	if labelType == 'oneHot':
 		nClasses = labels.shape[1]
-	#nTotalImages = nImagesPerClassTrain + nImagesPerClassTest
-	#totalImages = np.zeros((nClasses, nTotalImages), dtype='uint32')
-	#totallabels = np.zeros((nClasses, nTotalImages, nClasses))
 	nTrainImages = int(imageIds.shape[0]*0.7)
 	trainImages = imageIds[0:nTrainImages]
 	testImages = imageIds[nTrainImages:]
 	trainLabels = labels[0:nTrainImages]
 	testLabels = labels[nTrainImages:]
-
 	trainSetImageIds = np.zeros((nClasses, nImagesPerClassTrain), dtype='uint32')
 	trainSetLabels = np.zeros((nClasses, nImagesPerClassTrain, nClasses))
-	#pdb.set_trace()
 	for i in range(nClasses):
 		consider = trainLabels[:, i] == 1
 		curImageIds = trainImages[consider]
@@ -45,10 +39,8 @@ def makeDataSet(imageIds, labels, labelType = 'oneHot', nImagesPerClassTrain=500
 		curImageIds, curLabels = shuffleInUnison(curImageIds, curLabels)
 		trainSetImageIds[i,:] = np.reshape(curImageIds[0:nImagesPerClassTrain], (nImagesPerClassTrain,))
 		trainSetLabels[i, :, :] = curLabels[0:nImagesPerClassTrain]
-
 	testSetImageIds = np.zeros((nClasses, nImagesPerClassTest), dtype='uint32')
 	testSetLabels = np.zeros((nClasses, nImagesPerClassTest, nClasses))
-	#pdb.set_trace()
 	for i in range(nClasses):
 		consider = testLabels[:, i] == 1
 		curImageIds = testImages[consider]
@@ -56,7 +48,6 @@ def makeDataSet(imageIds, labels, labelType = 'oneHot', nImagesPerClassTrain=500
 		curImageIds, curLabels = shuffleInUnison(curImageIds, curLabels)
 		testSetImageIds[i,:] = np.reshape(curImageIds[0:nImagesPerClassTest], (nImagesPerClassTest,))
 		testSetLabels[i, :, :] = curLabels[0:nImagesPerClassTest]
-	
 	trainSetImageIds = np.reshape(trainSetImageIds, (nClasses*nImagesPerClassTrain,))
 	trainSetLabels = np.reshape(trainSetLabels, (nClasses*nImagesPerClassTrain, nClasses))
 	testSetImageIds = np.reshape(testSetImageIds, (nClasses*nImagesPerClassTest,))
@@ -72,7 +63,6 @@ def resizeImages(images, resizeHeight=256, resizeWidth = 256):
 
 
 def cropImages(images, cropHeight=227, cropWidth=227):
-	#pdb.set_trace()
 	croppedImages = np.zeros((images.shape[0], 3, cropHeight, cropWidth))
 	for i in range(croppedImages.shape[0]):
 		randX = np.random.randint(images.shape[2]-cropHeight)
@@ -83,7 +73,6 @@ def cropImages(images, cropHeight=227, cropWidth=227):
 
 def meanSubtract(images, sourceDataSet='IMAGENET', order='RGB'):
 	if order == 'RGB':
-		#in RGB order
 	    images[:, 0, :, :] -= 123.68
 	    images[:, 1, :, :] -= 116.779
 	    images[:, 2, :, :] -= 103.939 # values copied from https://github.com/heuritech/convnets-keras/blob/master/convnetskeras/convnets.py
@@ -140,29 +129,24 @@ def prepareData(dataset='CIFAR10'):
 	return trainData, trainLabels, queryData, queryLabels, galleryData, galleryLabels
 
 def multiLabelGetVectors(data, dim=300, nClasses=81, nTags=1000, method='mean'):
-	#pdb.set_trace()
 	vecMat = np.zeros((len(data), dim))
 	labels = np.zeros((len(data), nClasses))
 	images = np.zeros((len(data), 1))
 	tags = np.zeros((len(data), nTags))
 	for i in range(len(data)):
 		curRec = data[i]
-
 		curVector = np.zeros((300, ))
 		images[i] = curRec[0]
 		labels[i] = curRec[1]
 		if method == 'mean':
 			for j in range(len(curRec[2])):
-				#pdb.set_trace()
 				curVector = curVector + curRec[2][j]
 				tags[i][int(curRec[2][j][1])] = 1
-				#pdb.set_trace()
 			vecMat[i][:] = curVector/float(len(curRec[2]))
 		elif method == 'idf':
 			#pdb.set_trace()
 			avg = 0
 			for j in range(len(curRec[2])):
-				#pdb.set_trace()
 				curVector = curVector +[x* curRec[2][j][2] for x in curRec[2][j][0]]
 				tags[i][int(curRec[2][j][1])] = 1
 				avg = avg + curRec[2][j][2]
@@ -179,7 +163,6 @@ def multiLabelGetVectors(data, dim=300, nClasses=81, nTags=1000, method='mean'):
 		elif method == 'cutFreq':
 			avg = 0.00001
 			for j in range(len(curRec[2])):
-				#pdb.set_trace()
 				if curRec[2][j][2] > 5.3 and curRec[2][j][2] < 8.2:
 					curVector = curVector +[x* curRec[2][j][2] for x in curRec[2][j][0]]
 					tags[i][int(curRec[2][j][1])] = 1
@@ -189,30 +172,23 @@ def multiLabelGetVectors(data, dim=300, nClasses=81, nTags=1000, method='mean'):
 	return (images, labels, vecMat, tags)
 
 def multiLabelGetVectorsNUS(data, dim=300, nClasses=81, nTags=1000, method='mean'):
-	#pdb.set_trace()
 	vecMat = np.zeros((len(data), dim))
 	labels = np.zeros((len(data), nClasses))
 	images = np.zeros((len(data), 1))
 	tags = []
 	for i in range(len(data)):
 		curRec = data[i]
-
 		curVector = np.zeros((300, ))
 		images[i] = curRec[0]
 		labels[i] = curRec[1]
 		if method == 'mean':
 			for j in range(len(curRec[2])):
-				#pdb.set_trace()
 				curVector = curVector + curRec[2][j]
-				#pdb.set_trace()
 			vecMat[i][:] = curVector/float(len(curRec[2]))
-			#pdb.set_trace()
 			tags.append(curRec[3])
 		elif method == 'idf':
-			#pdb.set_trace()
 			avg = 0
 			for j in range(len(curRec[2])):
-				#pdb.set_trace()
 				curVector = curVector +[x* curRec[2][j][2] for x in curRec[2][j][0]]
 				avg = avg + curRec[2][j][2]
 			vecMat[i][:] = curVector/float(avg)
@@ -227,7 +203,6 @@ def multiLabelGetVectorsNUS(data, dim=300, nClasses=81, nTags=1000, method='mean
 		elif method == 'cutFreq':
 			avg = 0.00001
 			for j in range(len(curRec[2])):
-				#pdb.set_trace()
 				if curRec[2][j][2] > 5.3 and curRec[2][j][2] < 8.2:
 					curVector = curVector +[x* curRec[2][j][2] for x in curRec[2][j][0]]
 					avg = avg + curRec[2][j][2]
@@ -236,7 +211,6 @@ def multiLabelGetVectorsNUS(data, dim=300, nClasses=81, nTags=1000, method='mean
 	return (images, labels, vecMat, tags)
 
 def multiLabelGetVectorsDelete(data, dim=300, nClasses=81, nTags=1000, method='mean'):
-	#pdb.set_trace()
 	vecMat = np.zeros((len(data), dim))
 	labels = np.zeros((len(data), nClasses))
 	images = np.zeros((len(data), 1))
@@ -273,38 +247,29 @@ def checkIfWeightsAreNotLost(model_1, model_2, layerList):
 	return sameWeights
 
 def preprocessLabels(labels):
-	#pdb.set_trace()
 	temp = np.sum(labels, axis =0)
 	temp = np.argsort(temp)
 	temp = temp[-21:]
 	labels = labels[:,temp]
 	temp = np.array(np.sum(labels, axis=-1) !=0, dtype='bool')
 	labels = labels[temp]
-	
-	#pdb.set_trace()
 	return labels
 
 def computeSimilarityMatrix(queryLabels, databaseLabels, typeOfData='singleLabelled', type='interOverUnion'):
-	#pdb.set_trace()
 	count = 0
 	groundTruthSimilarityMatrix = np.zeros((queryLabels.shape[0], databaseLabels.shape[0]))
 	if typeOfData=='singleLabelled':
 		for i in range(queryLabels.shape[0]):
 			groundTruthSimilarityMatrix[i,:] = queryLabels[i] == databaseLabels
 	elif typeOfData=='multiLabelled':
-		#pdb.set_trace()
 		for i in range(queryLabels.shape[0]):
 			curQue = queryLabels[i][:]
 			if sum(curQue) != 0:
 				threshold = 1
-				#print(threshold)
-				#pdb.set_trace()
 				sim = np.sum(np.logical_and(curQue, databaseLabels), axis=-1)
 				den = np.sum(np.logical_or(curQue, databaseLabels), axis=-1)
-				#pdb.set_trace()
 				count = count + np.sum(np.logical_and(sum(curQue) > 1, sim == 1))
-				if type=='zeroOne':
-					#pdb.set_trace()		
+				if type=='zeroOne':		
 					groundTruthSimilarityMatrix[i][np.where(sim >= threshold)[0]] = 1
 				elif type=='interOverUnion':
 					groundTruthSimilarityMatrix[i][:] = np.divide(np.array(sim,dtype='float32'),(np.array(den,dtype='float32')+0.00001))						
@@ -319,12 +284,8 @@ def computeSimilarityMatrix(queryLabels, databaseLabels, typeOfData='singleLabel
 				# 	elif type=='interOverUnion':
 				# 		groundTruthSimilarityMatrix[i][j] = float(sim)/(float(den)+0.00001)
 	if type=='zeroOne':
-		#print("zeroOne")
-		#pdb.set_trace()
 		groundTruthSimilarityMatrix = np.asarray(groundTruthSimilarityMatrix, dtype='float32')
-		#print(count)
 	elif type=='interOverUnion':
-		#print("interOverUnion")
 		groundTruthSimilarityMatrix = groundTruthSimilarityMatrix > 0.25
 		groundTruthSimilarityMatrix = np.asarray(groundTruthSimilarityMatrix, dtype='float32')
 	return groundTruthSimilarityMatrix
@@ -339,7 +300,6 @@ def calcHammingRank(queryHashes, databaseHashes, space='Hamming'):
 			hammingRank[i] = np.argsort(hammingDist[i])
 	elif space == 'RealValued':
 		for i in range(queryHashes.shape[0]):
-			#pdb.set_trace()
 			if i % 100 == 0:
 				print(i)
 			hammingDist[i] = cdist(np.reshape(queryHashes[i], (1, 300)),databaseHashes ,  'cosine')
@@ -348,26 +308,19 @@ def calcHammingRank(queryHashes, databaseHashes, space='Hamming'):
 
 
 def calcMAP(groundTruthSimilarityMatrix, hammingRank, hammingDist):
-	#pdb.set_trace()
 	[Q, N] = hammingRank.shape
 	pos = np.arange(N)+1
 	MAP = 0
 	numSucc = 0
-
 	for i in range(Q):
 		ngb = groundTruthSimilarityMatrix[i, np.asarray(hammingRank[i,:], dtype='int32')]
 		ngb = ngb[0:N]
 		nRel = np.sum(ngb)
 		if nRel > 0:
-			#pdb.set_trace()
 			prec = np.divide(np.cumsum(ngb), pos)
 			prec = prec[0:5000]
 			ngb = ngb[0:5000]
-			#pdb.set_trace()
 			ap = np.mean(prec[np.asarray(ngb, dtype='bool')])
-			#prec = prec
-			#ap = np.mean(prec[np.asarray(ngb, dtype='bool')])
-			#pdb.set_trace()
 			rec = np.array(np.cumsum(ngb)/float(np.sum(groundTruthSimilarityMatrix[i])), dtype='float32')
 			if i == 0:
 				precisions = prec
@@ -385,7 +338,6 @@ def calcMAP(groundTruthSimilarityMatrix, hammingRank, hammingDist):
 	for j in range(8):
 		countOrNot = np.array(hammingDist <= j, dtype='int32')
 		newSim = np.multiply(groundTruthSimilarityMatrix, countOrNot)
-		#pdb.set_trace()
 		countOrNot = countOrNot + 0.000001
 		prec = np.mean(np.divide(np.sum(newSim, axis=-1), np.sum(countOrNot, axis=-1)))# float(np.sum(np.sum(newSim)))/float(np.sum())
 		rec = np.mean(np.divide(np.sum(newSim, axis=-1), np.sum(groundTruthSimilarityMatrix, axis=-1)))
@@ -399,7 +351,6 @@ def getMAP(queryLabels, databaseLabels, queryHashes, databaseHashes, curType, ty
 		groundTruthSimilarityMatrix = computeSimilarityMatrix(queryLabels, databaseLabels)
 	elif typeOfData == 'multiLabelled':
 		groundTruthSimilarityMatrix = computeSimilarityMatrix(queryLabels, databaseLabels, typeOfData='multiLabelled', type = curType)
-	#pdb.set_trace()
 	hammingDist, hammingRank = calcHammingRank(queryHashes, databaseHashes, space)
 	MAP, precisions, recalls = calcMAP(groundTruthSimilarityMatrix, hammingRank, hammingDist)
 	precisions = []
